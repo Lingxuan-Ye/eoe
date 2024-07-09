@@ -36,6 +36,30 @@ impl<T> ExitOnError<T> for Option<T> {
         }
     }
 }
+pub trait QuitOnError<T>: internal::Sealed {
+    fn quit_on_error(self) -> T;
+}
+
+impl<T, E> QuitOnError<T> for Result<T, E>
+where
+    E: Into<Error>,
+{
+    fn quit_on_error(self) -> T {
+        self.exit_on_error()
+    }
+}
+
+impl<T> QuitOnError<T> for Option<T> {
+    fn quit_on_error(self) -> T {
+        match self {
+            None => {
+                error!("unexpected None");
+                exit(1);
+            }
+            Some(value) => value,
+        }
+    }
+}
 
 mod internal {
     pub trait Sealed {}
