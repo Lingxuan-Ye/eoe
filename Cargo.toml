@@ -1,0 +1,14 @@
+[package]
+name = "eoe"
+version = "0.1.0"
+edition = "2021"
+authors = ["Lingxuan Ye <love@lingxuan.io>"]
+categories = ["command-line-utilities"]
+repository = "https://github.com/Lingxuan-Ye/eoe"
+readme = "README.md"
+license = "MIT"
+description = "This crate helps you exit on error with underlying `anyhow` error handling."
+
+[dependencies]
+ansi_term = "0.12.1"
+anyhow = "1.0.86"
