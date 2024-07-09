@@ -10,3 +10,5 @@ license = "MIT"
 description = "This crate helps you exit on error with underlying `anyhow` error handling."
 
 [dependencies]
+ansi_term = "0.12.1"
+anyhow = "1.0.86"
