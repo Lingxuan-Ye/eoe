@@ -7,6 +7,7 @@ categories = ["command-line-utilities"]
 repository = "https://github.com/Lingxuan-Ye/eoe"
 readme = "README.md"
 license = "MIT"
+exclude = ["/assets/"]
 description = "This crate helps you exit on error with underlying `anyhow` error handling."
 
 [dependencies]
