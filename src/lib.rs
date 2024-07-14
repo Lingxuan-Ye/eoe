@@ -7,6 +7,30 @@ use std::process::exit;
 #[macro_use]
 mod macros;
 
+/// Exits the process with an error message if the result is an error
+/// or the option is `None`.
+///
+/// # Examples
+///
+/// On error:
+///
+/// ```should_panic
+/// use anyhow::{anyhow, Context};
+/// use eoe::ExitOnError;
+///
+/// Err::<(), _>(anyhow!("Mm-noom-ba-deh"))
+///     .context("Doom-boom-ba-beh")
+///     .context("Doo-boo-boom-ba-beh-beh")
+///     .exit_on_error();
+/// ```
+///
+/// On `None`:
+///
+/// ```should_panic
+/// # use eoe::ExitOnError;
+/// #
+/// None::<()>.exit_on_error();
+/// ```
 pub trait ExitOnError<T>: internal::Sealed {
     fn exit_on_error(self) -> T;
 }
@@ -19,7 +43,7 @@ where
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```should_panic
     /// use anyhow::{anyhow, Context};
     /// use eoe::ExitOnError;
     ///
@@ -46,7 +70,7 @@ impl<T> ExitOnError<T> for Option<T> {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```should_panic
     /// use eoe::ExitOnError;
     ///
     /// None::<()>.exit_on_error();
@@ -62,9 +86,31 @@ impl<T> ExitOnError<T> for Option<T> {
     }
 }
 
-/// Well, if you prefer `quit` to `exit`.
+/// Well, if you prefer the word `quit` to `exit`.
 ///
-/// Refer to [`ExitOnError`] for more information.
+/// Quits the process with an error message if the result is an error
+/// or the option is `None`.
+///
+/// # Examples
+///
+/// On error:
+///
+/// ```should_panic
+/// use anyhow::{anyhow, Context};
+/// use eoe::QuitOnError;
+///
+/// Err::<(), _>(anyhow!("Mm-ba-ba-beh, mm-ba-ba-beh"))
+///     .context("Dee-day-da, ee-day-da")
+///     .quit_on_error();
+/// ```
+///
+/// On `None`:
+///
+/// ```should_panic
+/// # use eoe::QuitOnError;
+/// #
+/// None::<()>.quit_on_error();
+/// ```
 pub trait QuitOnError<T>: internal::Sealed {
     fn quit_on_error(self) -> T;
 }
@@ -77,7 +123,7 @@ where
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```should_panic
     /// use anyhow::{anyhow, Context};
     /// use eoe::QuitOnError;
     ///
@@ -95,7 +141,7 @@ impl<T> QuitOnError<T> for Option<T> {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```should_panic
     /// use eoe::QuitOnError;
     ///
     /// None::<()>.quit_on_error();
