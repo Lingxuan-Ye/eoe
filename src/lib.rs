@@ -1,8 +1,13 @@
-//! This crate helps you exit on error with underlying [`anyhow`]
-//! error handling.
+//! This crate provides utilities for exiting processes on errors
+//! gracefully, leveraging [`anyhow`] to display detailed error
+//! context and chained messages.
+//!
+//! It is recommended to use the re-exported version of [`anyhow`]
+//! to avoid potential version conflicts.
 
-use anyhow::Error;
-use std::process::exit;
+pub use anyhow;
+
+use std::process;
 
 #[macro_use]
 mod macros;
@@ -15,8 +20,8 @@ mod macros;
 /// On error:
 ///
 /// ```should_panic
-/// use anyhow::{anyhow, Context};
 /// use eoe::ExitOnError;
+/// use eoe::anyhow::{Context, anyhow};
 ///
 /// Err::<(), _>(anyhow!("Mm-noom-ba-deh"))
 ///     .context("Doom-boom-ba-beh")
@@ -37,15 +42,15 @@ pub trait ExitOnError<T>: internal::Sealed {
 
 impl<T, E> ExitOnError<T> for Result<T, E>
 where
-    E: Into<Error>,
+    E: Into<anyhow::Error>,
 {
     /// Exits the process with an error message if the result is an error.
     ///
     /// # Examples
     ///
     /// ```should_panic
-    /// use anyhow::{anyhow, Context};
     /// use eoe::ExitOnError;
+    /// use eoe::anyhow::{Context, anyhow};
     ///
     /// Err::<(), _>(anyhow!("Mm-noom-ba-deh"))
     ///     .context("Doom-boom-ba-beh")
@@ -58,7 +63,7 @@ where
                 let error = error.into();
                 error!(error);
                 error.chain().skip(1).for_each(|cause| caused_by!(cause));
-                exit(1);
+                process::exit(1);
             }
             Ok(value) => value,
         }
@@ -79,7 +84,7 @@ impl<T> ExitOnError<T> for Option<T> {
         match self {
             None => {
                 error!("unexpected None");
-                exit(1);
+                process::exit(1);
             }
             Some(value) => value,
         }
@@ -96,8 +101,8 @@ impl<T> ExitOnError<T> for Option<T> {
 /// On error:
 ///
 /// ```should_panic
-/// use anyhow::{anyhow, Context};
 /// use eoe::QuitOnError;
+/// use eoe::anyhow::{Context, anyhow};
 ///
 /// Err::<(), _>(anyhow!("Mm-ba-ba-beh, mm-ba-ba-beh"))
 ///     .context("Dee-day-da, ee-day-da")
@@ -117,15 +122,15 @@ pub trait QuitOnError<T>: internal::Sealed {
 
 impl<T, E> QuitOnError<T> for Result<T, E>
 where
-    E: Into<Error>,
+    E: Into<anyhow::Error>,
 {
     /// Quits the process with an error message if the result is an error.
     ///
     /// # Examples
     ///
     /// ```should_panic
-    /// use anyhow::{anyhow, Context};
     /// use eoe::QuitOnError;
+    /// use eoe::anyhow::{Context, anyhow};
     ///
     /// Err::<(), _>(anyhow!("Mm-ba-ba-beh, mm-ba-ba-beh"))
     ///     .context("Dee-day-da, ee-day-da")
@@ -147,18 +152,12 @@ impl<T> QuitOnError<T> for Option<T> {
     /// None::<()>.quit_on_error();
     /// ```
     fn quit_on_error(self) -> T {
-        match self {
-            None => {
-                error!("unexpected None");
-                exit(1);
-            }
-            Some(value) => value,
-        }
+        self.exit_on_error()
     }
 }
 
 mod internal {
     pub trait Sealed {}
-    impl<T, E> Sealed for Result<T, E> where E: Into<super::Error> {}
+    impl<T, E> Sealed for Result<T, E> where E: Into<anyhow::Error> {}
     impl<T> Sealed for Option<T> {}
 }
