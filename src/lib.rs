@@ -1,5 +1,9 @@
-//! This crate helps you exit on error with underlying [`anyhow`]
-//! error handling.
+//! This crate provides utilities for exiting processes on errors
+//! gracefully, leveraging [`anyhow`] to display detailed error
+//! context and chained messages.
+//!
+//! It is recommended to use the re-exported version of [`anyhow`]
+//! to avoid potential version conflicts.
 
 pub use anyhow;
 
@@ -16,8 +20,8 @@ mod macros;
 /// On error:
 ///
 /// ```should_panic
-/// use anyhow::{anyhow, Context};
 /// use eoe::ExitOnError;
+/// use eoe::anyhow::{Context, anyhow};
 ///
 /// Err::<(), _>(anyhow!("Mm-noom-ba-deh"))
 ///     .context("Doom-boom-ba-beh")
@@ -45,8 +49,8 @@ where
     /// # Examples
     ///
     /// ```should_panic
-    /// use anyhow::{anyhow, Context};
     /// use eoe::ExitOnError;
+    /// use eoe::anyhow::{Context, anyhow};
     ///
     /// Err::<(), _>(anyhow!("Mm-noom-ba-deh"))
     ///     .context("Doom-boom-ba-beh")
@@ -97,8 +101,8 @@ impl<T> ExitOnError<T> for Option<T> {
 /// On error:
 ///
 /// ```should_panic
-/// use anyhow::{anyhow, Context};
 /// use eoe::QuitOnError;
+/// use eoe::anyhow::{Context, anyhow};
 ///
 /// Err::<(), _>(anyhow!("Mm-ba-ba-beh, mm-ba-ba-beh"))
 ///     .context("Dee-day-da, ee-day-da")
@@ -125,8 +129,8 @@ where
     /// # Examples
     ///
     /// ```should_panic
-    /// use anyhow::{anyhow, Context};
     /// use eoe::QuitOnError;
+    /// use eoe::anyhow::{Context, anyhow};
     ///
     /// Err::<(), _>(anyhow!("Mm-ba-ba-beh, mm-ba-ba-beh"))
     ///     .context("Dee-day-da, ee-day-da")
