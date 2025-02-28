@@ -147,13 +147,7 @@ impl<T> QuitOnError<T> for Option<T> {
     /// None::<()>.quit_on_error();
     /// ```
     fn quit_on_error(self) -> T {
-        match self {
-            None => {
-                error!("unexpected None");
-                exit(1);
-            }
-            Some(value) => value,
-        }
+        self.exit_on_error()
     }
 }
 
