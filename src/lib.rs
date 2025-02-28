@@ -1,8 +1,7 @@
 //! This crate helps you exit on error with underlying [`anyhow`]
 //! error handling.
 
-use anyhow::Error;
-use std::process::exit;
+use std::process;
 
 #[macro_use]
 mod macros;
@@ -37,7 +36,7 @@ pub trait ExitOnError<T>: internal::Sealed {
 
 impl<T, E> ExitOnError<T> for Result<T, E>
 where
-    E: Into<Error>,
+    E: Into<anyhow::Error>,
 {
     /// Exits the process with an error message if the result is an error.
     ///
@@ -58,7 +57,7 @@ where
                 let error = error.into();
                 error!(error);
                 error.chain().skip(1).for_each(|cause| caused_by!(cause));
-                exit(1);
+                process::exit(1);
             }
             Ok(value) => value,
         }
@@ -79,7 +78,7 @@ impl<T> ExitOnError<T> for Option<T> {
         match self {
             None => {
                 error!("unexpected None");
-                exit(1);
+                process::exit(1);
             }
             Some(value) => value,
         }
@@ -117,7 +116,7 @@ pub trait QuitOnError<T>: internal::Sealed {
 
 impl<T, E> QuitOnError<T> for Result<T, E>
 where
-    E: Into<Error>,
+    E: Into<anyhow::Error>,
 {
     /// Quits the process with an error message if the result is an error.
     ///
@@ -153,6 +152,6 @@ impl<T> QuitOnError<T> for Option<T> {
 
 mod internal {
     pub trait Sealed {}
-    impl<T, E> Sealed for Result<T, E> where E: Into<super::Error> {}
+    impl<T, E> Sealed for Result<T, E> where E: Into<anyhow::Error> {}
     impl<T> Sealed for Option<T> {}
 }
