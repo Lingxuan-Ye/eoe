@@ -1,6 +1,8 @@
 //! This crate helps you exit on error with underlying [`anyhow`]
 //! error handling.
 
+pub use anyhow;
+
 use std::process;
 
 #[macro_use]
