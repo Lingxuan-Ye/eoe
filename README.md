@@ -6,19 +6,11 @@
 
 This crate provides utilities for exiting processes on errors gracefully, leveraging `anyhow` to display detailed error context and chained messages.
 
-It is recommended to use the re-exported version of `anyhow` to avoid potential version conflicts.
-
-## Install
-
-```
-cargo add eoe
-```
-
 ## Examples
 
 ```rust
+use anyhow::{Context, anyhow};
 use eoe::ExitOnError;
-use eoe::anyhow::{Context, anyhow};
 
 Err::<(), _>(anyhow!("Mm-noom-ba-deh"))
     .context("Doom-boom-ba-beh")
@@ -29,8 +21,8 @@ Err::<(), _>(anyhow!("Mm-noom-ba-deh"))
 ![](assets/01.png)
 
 ```rust
+use anyhow::{Context, anyhow};
 use eoe::QuitOnError;
-use eoe::anyhow::{Context, anyhow};
 
 Err::<(), _>(anyhow!("Mm-ba-ba-beh, mm-ba-ba-beh"))
     .context("Dee-day-da, ee-day-da")
