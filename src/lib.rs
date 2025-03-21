@@ -47,8 +47,7 @@
 //! Messages are customizable:
 //!
 //! ```should_panic
-//! use eoe::{ExitOnError, Segment};
-//! use owo_colors::Style;
+//! use eoe::{ExitOnError, Segment, Style};
 //!
 //! let _ = eoe::ERROR.set(Segment {
 //!     style: Style::new().bold().blue(),
@@ -71,8 +70,10 @@
 //! </div>
 //! </details>
 
+pub use owo_colors::Style;
+
 use anyhow::Error;
-use owo_colors::{OwoColorize, Stream, Style};
+use owo_colors::{OwoColorize, Stream};
 use std::fmt::Display;
 use std::io::{StderrLock, Write, stderr};
 use std::process::exit;

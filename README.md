@@ -51,8 +51,7 @@ Err::<(), _>(anyhow!("Mm-ba-ba-beh, mm-ba-ba-beh"))
 Messages are customizable:
 
 ```rust
-use eoe::{ExitOnError, Segment};
-use owo_colors::Style;
+use eoe::{ExitOnError, Segment, Style};
 
 let _ = eoe::ERROR.set(Segment {
     style: Style::new().bold().blue(),
