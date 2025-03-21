@@ -192,7 +192,7 @@ impl Fallback {
         value: "caused by",
     };
     const SEP: Segment<&str> = Segment {
-        style: Style::new(),
+        style: Style::new().red().bold(),
         value: ": ",
     };
     const MESSAGE_STYLE: Style = Style::new();
