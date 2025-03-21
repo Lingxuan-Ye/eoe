@@ -11,5 +11,5 @@ exclude = ["/assets/"]
 description = "This crate provides utilities for exiting processes on errors gracefully."
 
 [dependencies]
-ansi_term = "0.12.1"
 anyhow = "1.0.0"
+owo-colors = { version = "4.2.0", features = ["supports-colors"] }
