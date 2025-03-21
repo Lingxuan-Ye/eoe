@@ -1,6 +1,75 @@
 //! This crate provides utilities for exiting processes on errors
 //! gracefully, leveraging [`anyhow`] to display detailed error
 //! context and chained messages.
+//!
+//! # Examples
+//!
+//! Exiting on error:
+//!
+//! ```should_panic
+//! use anyhow::{Context, anyhow};
+//! use eoe::ExitOnError;
+//!
+//! Err::<(), _>(anyhow!("Mm-noom-ba-deh"))
+//!     .context("Doom-boom-ba-beh")
+//!     .context("Doo-boo-boom-ba-beh-beh")
+//!     .exit_on_error();
+//! ```
+//!
+//! <details>
+//! <summary> Show output </summary>
+//! <div style="background-color: #1e1e1e; font-family: monospace; padding: 10px; border-radius: 5px;">
+//!     <span style="color: #f14c4c; font-weight: bold">error</span><span style="color: #f14c4c; font-weight: bold">: </span><span style="color: #cccccc">Doo-boo-boom-ba-beh-beh</span><br>
+//!     <span style="color: #f14c4c; font-weight: bold">caused by</span><span style="color: #f14c4c; font-weight: bold">: </span><span style="color: #cccccc">Doom-boom-ba-beh</span><br>
+//!     <span style="color: #f14c4c; font-weight: bold">caused by</span><span style="color: #f14c4c; font-weight: bold">: </span><span style="color: #cccccc">Mm-noom-ba-deh</span><br>
+//! </div>
+//! </details>
+//!
+//! Or if you prefer the word *quit*:
+//!
+//! ```should_panic
+//! use anyhow::{Context, anyhow};
+//! use eoe::QuitOnError;
+//!
+//! Err::<(), _>(anyhow!("Mm-ba-ba-beh, mm-ba-ba-beh"))
+//!     .context("Dee-day-da, ee-day-da")
+//!     .quit_on_error();
+//! ```
+//!
+//! <details>
+//! <summary> Show output </summary>
+//! <div style="background-color: #1e1e1e; font-family: monospace; padding: 10px; border-radius: 5px;">
+//!     <span style="color: #f14c4c; font-weight: bold">error</span><span style="color: #f14c4c; font-weight: bold">: </span><span style="color: #cccccc">Dee-day-da, ee-day-da</span><br>
+//!     <span style="color: #f14c4c; font-weight: bold">caused by</span><span style="color: #f14c4c; font-weight: bold">: </span><span style="color: #cccccc">Mm-ba-ba-beh, mm-ba-ba-beh</span><br>
+//! </div>
+//! </details>
+//!
+//! Messages are customizable:
+//!
+//! ```should_panic
+//! use eoe::{ExitOnError, Segment};
+//! use owo_colors::Style;
+//!
+//! let _ = eoe::ERROR.set(Segment {
+//!     style: Style::new().bold().blue(),
+//!     value: "Watchin' some good friends screamin'",
+//! });
+//! let _ = eoe::SEP.set(Segment {
+//!     style: Style::new(),
+//!     value: " 😱 ",
+//! });
+//! let _ = eoe::MESSAGE_STYLE.set(Style::new().italic().yellow());
+//! let _ = eoe::MESSAGE_ON_NONE.set("Let me out");
+//!
+//! None::<()>.exit_on_error();
+//! ```
+//!
+//! <details>
+//! <summary> Show output </summary>
+//! <div style="background-color: #1e1e1e; font-family: monospace; padding: 10px; border-radius: 5px;">
+//!     <span style="color: #3b8eea; font-weight: bold">Watchin' some good friends screamin'</span><span> 😱 </span><span style="color: #e5e510; font-style: italic">Let me out</span><br>
+//! </div>
+//! </details>
 
 use anyhow::Error;
 use owo_colors::{OwoColorize, Stream, Style};
@@ -9,37 +78,21 @@ use std::io::{StderrLock, Write, stderr};
 use std::process::exit;
 use std::sync::OnceLock;
 
+/// The *error* label.
 pub static ERROR: OnceLock<Segment<&str>> = OnceLock::new();
+/// The *caused by* label.
 pub static CAUSED_BY: OnceLock<Segment<&str>> = OnceLock::new();
+/// The separator between the label and the message.
 pub static SEP: OnceLock<Segment<&str>> = OnceLock::new();
+/// The style of messages.
 pub static MESSAGE_STYLE: OnceLock<Style> = OnceLock::new();
+/// The message to display when exiting on `None`.
 pub static MESSAGE_ON_NONE: OnceLock<&str> = OnceLock::new();
 
-/// Exits the process with an error message if the result is an error
-/// or the option is `None`.
-///
-/// # Examples
-///
-/// On error:
-///
-/// ```should_panic
-/// use anyhow::{Context, anyhow};
-/// use eoe::ExitOnError;
-///
-/// Err::<(), _>(anyhow!("Mm-noom-ba-deh"))
-///     .context("Doom-boom-ba-beh")
-///     .context("Doo-boo-boom-ba-beh-beh")
-///     .exit_on_error();
-/// ```
-///
-/// On `None`:
-///
-/// ```should_panic
-/// # use eoe::ExitOnError;
-/// #
-/// None::<()>.exit_on_error();
-/// ```
+/// A trait for exiting processes gracefully.
 pub trait ExitOnError<T>: internal::Sealed {
+    /// Exits the process with an error message if the result is an error
+    /// or the option is `None`.
     fn exit_on_error(self) -> T;
 }
 
@@ -99,32 +152,12 @@ impl<T> ExitOnError<T> for Option<T> {
     }
 }
 
-/// Well, if you prefer the word `quit` to `exit`.
+/// Well, if you prefer the word *quit* to *exit*.
 ///
-/// Quits the process with an error message if the result is an error
-/// or the option is `None`.
-///
-/// # Examples
-///
-/// On error:
-///
-/// ```should_panic
-/// use anyhow::{Context, anyhow};
-/// use eoe::QuitOnError;
-///
-/// Err::<(), _>(anyhow!("Mm-ba-ba-beh, mm-ba-ba-beh"))
-///     .context("Dee-day-da, ee-day-da")
-///     .quit_on_error();
-/// ```
-///
-/// On `None`:
-///
-/// ```should_panic
-/// # use eoe::QuitOnError;
-/// #
-/// None::<()>.quit_on_error();
-/// ```
+/// A trait for quitting processes gracefully.
 pub trait QuitOnError<T>: internal::Sealed {
+    /// Quits the process with an error message if the result is an error
+    /// or the option is `None`.
     fn quit_on_error(self) -> T;
 }
 
@@ -164,9 +197,12 @@ impl<T> QuitOnError<T> for Option<T> {
     }
 }
 
+/// A labeled message segment.
 #[derive(Debug)]
 pub struct Segment<T> {
+    /// The segment's style.
     pub style: Style,
+    /// The segment's value, typically a piece of text.
     pub value: T,
 }
 
