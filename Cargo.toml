@@ -1,12 +1,13 @@
 [package]
 name = "eoe"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2024"
 authors = ["Lingxuan Ye <love@lingxuan.io>"]
 categories = ["rust-patterns"]
 repository = "https://github.com/Lingxuan-Ye/eoe"
 readme = "README.md"
 license = "MIT"
+exclude = ["/assets/"]
 description = "This crate provides utilities for exiting processes on errors gracefully."
 
 [dependencies]
