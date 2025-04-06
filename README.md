@@ -2,7 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/eoe.svg)](https://crates.io/crates/eoe)
 [![Documentation](https://docs.rs/eoe/badge.svg)](https://docs.rs/eoe)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 This crate provides utilities for exiting processes on errors gracefully, leveraging `anyhow` to display detailed error context and chained messages.
 
