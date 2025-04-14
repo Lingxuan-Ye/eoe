@@ -75,7 +75,7 @@ pub use owo_colors::Style;
 use anyhow::Error;
 use owo_colors::{OwoColorize, Stream};
 use std::fmt::Display;
-use std::io::{StderrLock, Write, stderr};
+use std::io::{self, Write, stderr};
 use std::process::exit;
 use std::sync::OnceLock;
 
@@ -117,12 +117,7 @@ where
     fn exit_on_error(self) -> T {
         match self {
             Err(error) => {
-                let error: Error = error.into();
-                let mut stderr = stderr().lock();
-                print_error(&mut stderr, &error);
-                error.chain().skip(1).for_each(|cause| {
-                    print_caused_by(&mut stderr, cause);
-                });
+                print_error(error);
                 exit(1);
             }
             Ok(value) => value,
@@ -143,9 +138,7 @@ impl<T> ExitOnError<T> for Option<T> {
     fn exit_on_error(self) -> T {
         match self {
             None => {
-                let mut stderr = stderr().lock();
-                let message = MESSAGE_ON_NONE.get_or_init(|| Fallback::MESSAGE_ON_NONE);
-                print_error(&mut stderr, message);
+                print_none();
                 exit(1);
             }
             Some(value) => value,
@@ -236,40 +229,68 @@ impl Fallback {
     const MESSAGE_ON_NONE: &str = "unexpected None";
 }
 
-fn print_error<M>(stderr: &mut StderrLock, message: M)
+fn print_error<E>(error: E)
 where
-    M: Display,
+    E: Into<Error>,
 {
+    if let Err(error) = try_print_error(error) {
+        panic!("failed printing to stderr: {}", error);
+    }
+}
+
+fn try_print_error<E>(error: E) -> io::Result<()>
+where
+    E: Into<Error>,
+{
+    let mut stderr = stderr().lock();
+
+    for (index, message) in error.into().chain().enumerate() {
+        let label = if index == 0 {
+            ERROR.get_or_init(|| Fallback::ERROR)
+        } else {
+            CAUSED_BY.get_or_init(|| Fallback::CAUSED_BY)
+        };
+        let sep = SEP.get_or_init(|| Fallback::SEP);
+        let message = Segment {
+            style: *MESSAGE_STYLE.get_or_init(|| Fallback::MESSAGE_STYLE),
+            value: message,
+        };
+
+        writeln!(
+            stderr,
+            "{}{}{}",
+            label.display(Stream::Stderr),
+            sep.display(Stream::Stderr),
+            message.display(Stream::Stderr)
+        )?;
+    }
+
+    Ok(())
+}
+
+fn print_none() {
+    if let Err(error) = try_print_none() {
+        panic!("failed printing to stderr: {}", error);
+    }
+}
+
+fn try_print_none() -> io::Result<()> {
+    let mut stderr = stderr().lock();
+
     let label = ERROR.get_or_init(|| Fallback::ERROR);
-    print(stderr, label, message);
-}
-
-fn print_caused_by<M>(stderr: &mut StderrLock, message: M)
-where
-    M: Display,
-{
-    let label = CAUSED_BY.get_or_init(|| Fallback::CAUSED_BY);
-    print(stderr, label, message);
-}
-
-fn print<M>(stderr: &mut StderrLock, label: &Segment<&str>, message: M)
-where
-    M: Display,
-{
     let sep = SEP.get_or_init(|| Fallback::SEP);
     let message = Segment {
         style: *MESSAGE_STYLE.get_or_init(|| Fallback::MESSAGE_STYLE),
-        value: message,
+        value: MESSAGE_ON_NONE.get_or_init(|| Fallback::MESSAGE_ON_NONE),
     };
-    if let Err(io_error) = writeln!(
+
+    writeln!(
         stderr,
         "{}{}{}",
         label.display(Stream::Stderr),
         sep.display(Stream::Stderr),
         message.display(Stream::Stderr)
-    ) {
-        panic!("failed printing to stderr: {}", io_error);
-    }
+    )
 }
 
 mod internal {
