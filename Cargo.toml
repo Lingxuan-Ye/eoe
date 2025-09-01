@@ -10,5 +10,5 @@ license = "MIT"
 description = "This crate provides utilities for exiting processes on errors gracefully."
 
 [dependencies]
-anyhow = "1.0.0"
-owo-colors = { version = "4.2.0", features = ["supports-colors"] }
+anyhow = "1.0.2"
+owo-colors = { version = "4.2.2", features = ["supports-colors"] }
