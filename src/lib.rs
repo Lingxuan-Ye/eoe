@@ -44,7 +44,7 @@
 //! </div>
 //! </details>
 //!
-//! Messages are customizable:
+//! The output style is customizable:
 //!
 //! ```should_panic
 //! use eoe::{ExitOnError, Segment, Style};
@@ -200,33 +200,14 @@ pub struct Segment<T> {
     pub value: T,
 }
 
-impl<T> Segment<T>
-where
-    T: Display,
-{
-    fn display(&self, stream: Stream) -> impl Display {
+impl<T> Segment<T> {
+    fn display(&self, stream: Stream) -> impl Display
+    where
+        T: Display,
+    {
         self.value
             .if_supports_color(stream, |value| value.style(self.style))
     }
-}
-
-struct Fallback;
-
-impl Fallback {
-    const ERROR: Segment<&str> = Segment {
-        style: Style::new().red().bold(),
-        value: "error",
-    };
-    const CAUSED_BY: Segment<&str> = Segment {
-        style: Style::new().red().bold(),
-        value: "caused by",
-    };
-    const SEP: Segment<&str> = Segment {
-        style: Style::new().red().bold(),
-        value: ": ",
-    };
-    const MESSAGE_STYLE: Style = Style::new();
-    const MESSAGE_ON_NONE: &str = "unexpected None";
 }
 
 fn print_error<E>(error: E)
@@ -234,7 +215,7 @@ where
     E: Into<Error>,
 {
     if let Err(error) = try_print_error(error) {
-        panic!("failed printing to stderr: {}", error);
+        panic!("failed printing to stderr: {error}");
     }
 }
 
@@ -246,13 +227,13 @@ where
 
     for (index, message) in error.into().chain().enumerate() {
         let label = if index == 0 {
-            ERROR.get_or_init(|| Fallback::ERROR)
+            ERROR.get_or_init(|| default::ERROR)
         } else {
-            CAUSED_BY.get_or_init(|| Fallback::CAUSED_BY)
+            CAUSED_BY.get_or_init(|| default::CAUSED_BY)
         };
-        let sep = SEP.get_or_init(|| Fallback::SEP);
+        let sep = SEP.get_or_init(|| default::SEP);
         let message = Segment {
-            style: *MESSAGE_STYLE.get_or_init(|| Fallback::MESSAGE_STYLE),
+            style: *MESSAGE_STYLE.get_or_init(|| default::MESSAGE_STYLE),
             value: message,
         };
 
@@ -270,18 +251,18 @@ where
 
 fn print_none() {
     if let Err(error) = try_print_none() {
-        panic!("failed printing to stderr: {}", error);
+        panic!("failed printing to stderr: {error}");
     }
 }
 
 fn try_print_none() -> io::Result<()> {
     let mut stderr = stderr().lock();
 
-    let label = ERROR.get_or_init(|| Fallback::ERROR);
-    let sep = SEP.get_or_init(|| Fallback::SEP);
+    let label = ERROR.get_or_init(|| default::ERROR);
+    let sep = SEP.get_or_init(|| default::SEP);
     let message = Segment {
-        style: *MESSAGE_STYLE.get_or_init(|| Fallback::MESSAGE_STYLE),
-        value: MESSAGE_ON_NONE.get_or_init(|| Fallback::MESSAGE_ON_NONE),
+        style: *MESSAGE_STYLE.get_or_init(|| default::MESSAGE_STYLE),
+        value: MESSAGE_ON_NONE.get_or_init(|| default::MESSAGE_ON_NONE),
     };
 
     writeln!(
@@ -291,6 +272,25 @@ fn try_print_none() -> io::Result<()> {
         sep.display(Stream::Stderr),
         message.display(Stream::Stderr)
     )
+}
+
+mod default {
+    use super::{Segment, Style};
+
+    pub(super) const ERROR: Segment<&str> = Segment {
+        style: Style::new().red().bold(),
+        value: "error",
+    };
+    pub(super) const CAUSED_BY: Segment<&str> = Segment {
+        style: Style::new().red().bold(),
+        value: "caused by",
+    };
+    pub(super) const SEP: Segment<&str> = Segment {
+        style: Style::new().red().bold(),
+        value: ": ",
+    };
+    pub(super) const MESSAGE_STYLE: Style = Style::new();
+    pub(super) const MESSAGE_ON_NONE: &str = "unexpected None";
 }
 
 mod internal {

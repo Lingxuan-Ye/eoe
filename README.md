@@ -6,7 +6,7 @@
 
 This crate provides utilities for exiting processes on errors gracefully, leveraging `anyhow` to display detailed error context and chained messages.
 
-## Examples
+# Examples
 
 Exiting on error:
 
@@ -20,7 +20,14 @@ Err::<(), _>(anyhow!("Mm-noom-ba-deh"))
     .exit_on_error();
 ```
 
-![exit on error](assets/exit_on_error.png)
+<details>
+<summary> Show output </summary>
+<div style="background-color: #1e1e1e; font-family: monospace; padding: 10px; border-radius: 5px;">
+    <span style="color: #f14c4c; font-weight: bold">error</span><span style="color: #f14c4c; font-weight: bold">: </span><span style="color: #cccccc">Doo-boo-boom-ba-beh-beh</span><br>
+    <span style="color: #f14c4c; font-weight: bold">caused by</span><span style="color: #f14c4c; font-weight: bold">: </span><span style="color: #cccccc">Doom-boom-ba-beh</span><br>
+    <span style="color: #f14c4c; font-weight: bold">caused by</span><span style="color: #f14c4c; font-weight: bold">: </span><span style="color: #cccccc">Mm-noom-ba-deh</span><br>
+</div>
+</details>
 
 Or if you prefer the word *quit*:
 
@@ -33,9 +40,15 @@ Err::<(), _>(anyhow!("Mm-ba-ba-beh, mm-ba-ba-beh"))
     .quit_on_error();
 ```
 
-![quit on error](assets/quit_on_error.png)
+<details>
+<summary> Show output </summary>
+<div style="background-color: #1e1e1e; font-family: monospace; padding: 10px; border-radius: 5px;">
+    <span style="color: #f14c4c; font-weight: bold">error</span><span style="color: #f14c4c; font-weight: bold">: </span><span style="color: #cccccc">Dee-day-da, ee-day-da</span><br>
+    <span style="color: #f14c4c; font-weight: bold">caused by</span><span style="color: #f14c4c; font-weight: bold">: </span><span style="color: #cccccc">Mm-ba-ba-beh, mm-ba-ba-beh</span><br>
+</div>
+</details>
 
-Messages are customizable:
+The output style is customizable:
 
 ```rust
 use eoe::{ExitOnError, Segment, Style};
@@ -54,4 +67,9 @@ let _ = eoe::MESSAGE_ON_NONE.set("Let me out");
 None::<()>.exit_on_error();
 ```
 
-![customized](assets/customized.png)
+<details>
+<summary> Show output </summary>
+<div style="background-color: #1e1e1e; font-family: monospace; padding: 10px; border-radius: 5px;">
+    <span style="color: #3b8eea; font-weight: bold">Watchin' some good friends screamin'</span><span> 😱 </span><span style="color: #e5e510; font-style: italic">Let me out</span><br>
+</div>
+</details>
