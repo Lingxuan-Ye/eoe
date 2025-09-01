@@ -44,7 +44,7 @@
 //! </div>
 //! </details>
 //!
-//! Messages are customizable:
+//! The output style is customizable:
 //!
 //! ```should_panic
 //! use eoe::{ExitOnError, Segment, Style};
