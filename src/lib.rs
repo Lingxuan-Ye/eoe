@@ -234,7 +234,7 @@ where
     E: Into<Error>,
 {
     if let Err(error) = try_print_error(error) {
-        panic!("failed printing to stderr: {}", error);
+        panic!("failed printing to stderr: {error}");
     }
 }
 
@@ -270,7 +270,7 @@ where
 
 fn print_none() {
     if let Err(error) = try_print_none() {
-        panic!("failed printing to stderr: {}", error);
+        panic!("failed printing to stderr: {error}");
     }
 }
 
