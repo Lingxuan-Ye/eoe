@@ -2,7 +2,7 @@
 name = "eoe"
 version = "0.3.3"
 edition = "2024"
-authors = ["Lingxuan Ye <love@lingxuan.io>"]
+authors = ["Lingxuan Ye <ink@lingxuan.io>"]
 categories = ["rust-patterns"]
 repository = "https://github.com/Lingxuan-Ye/eoe"
 readme = "README.md"
