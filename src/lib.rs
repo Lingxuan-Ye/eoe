@@ -51,7 +51,11 @@
 //!
 //! let _ = eoe::ERROR.set(Segment {
 //!     style: Style::new().bold().blue(),
-//!     value: "Watchin' some good friends screamin' 😱",
+//!     value: "Watchin' some good friends screamin'",
+//! });
+//! let _ = eoe::SEP.set(Segment {
+//!     style: Style::new(),
+//!     value: " 😱 ",
 //! });
 //! let _ = eoe::MESSAGE_STYLE.set(Style::new().italic().yellow());
 //! let _ = eoe::MESSAGE_ON_NONE.set("Let me out");
@@ -62,7 +66,7 @@
 //! <details>
 //! <summary> Show output </summary>
 //! <div style="background-color: #1e1e1e; font-family: monospace; padding: 10px; border-radius: 5px;">
-//!     <span style="color: #3b8eea; font-weight: bold">Watchin' some good friends screamin' 😱</span> <span style="color: #e5e510; font-style: italic">Let me out</span><br>
+//!     <span style="color: #3b8eea; font-weight: bold">Watchin' some good friends screamin'</span><span> 😱 </span><span style="color: #e5e510; font-style: italic">Let me out</span><br>
 //! </div>
 //! </details>
 
